@@ -4,13 +4,19 @@ import joblib
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
-import shap
 import streamlit as st
 import sys
 from pathlib import Path
 
+try:
+    import shap
+    SHAP_AVAILABLE = True
+except ImportError:
+    SHAP_AVAILABLE = False
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from src.simulator import what_if_simulate, simulate_contract
+from src.hcahps_labels import feature_label
 
 st.set_page_config(page_title="What-If Analyzer", page_icon="🔮", layout="wide")
 st.sidebar.caption("⚠️ For research purposes only. Not financial or medical advice.")
@@ -170,19 +176,21 @@ st.markdown("---")
 st.subheader("SHAP — Top Improvement Levers")
 
 model, feature_cols, X = load_model()
-if model is not None and X is not None:
+if not SHAP_AVAILABLE:
+    st.info("Install `shap` locally (`pip install shap`) to enable SHAP analysis.")
+elif model is not None and X is not None:
     try:
         master_idx = df[df["CCN"] == ccn].index
         if not master_idx.empty and master_idx[0] in X.index:
             row_x = X.loc[master_idx[0]:master_idx[0], feature_cols].fillna(0)
             explainer = shap.TreeExplainer(model)
             sv = explainer.shap_values(row_x)
-            base_val = float(explainer.expected_value)
             shap_series = pd.Series(sv[0], index=feature_cols).abs().sort_values(ascending=False).head(8)
+            readable_labels = [feature_label(f) for f in shap_series.index]
 
             fig = go.Figure(go.Bar(
                 x=shap_series.values,
-                y=shap_series.index.tolist(),
+                y=readable_labels,
                 orientation="h",
                 marker_color=["#1A2B4A"] * len(shap_series),
             ))

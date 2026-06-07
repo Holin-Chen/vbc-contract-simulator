@@ -1,13 +1,16 @@
 """Page 1: Hospital Lookup & Value Profile."""
 
-import joblib
 import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-import shap
 import streamlit as st
+import sys
 from pathlib import Path
+
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from src.hcahps_labels import label as hcahps_label
 
 st.set_page_config(page_title="Hospital Lookup", page_icon="🔍", layout="wide")
 st.sidebar.caption("⚠️ For research purposes only. Not financial or medical advice.")
@@ -148,8 +151,10 @@ if domain_data:
 
 # ── HCAHPS highlights ─────────────────────────────────────────────────────────
 hcahps_cols = [c for c in df.columns if c.startswith("HCAHPS_")]
-hcahps_vals = {c.replace("HCAHPS_", "").replace("_", " "): pd.to_numeric(row.get(c, np.nan), errors="coerce")
-               for c in hcahps_cols}
+hcahps_vals = {
+    hcahps_label(c.replace("HCAHPS_", "")): pd.to_numeric(row.get(c, np.nan), errors="coerce")
+    for c in hcahps_cols
+}
 hcahps_vals = {k: v for k, v in hcahps_vals.items() if not pd.isna(v)}
 if hcahps_vals:
     st.subheader("HCAHPS Patient Experience Highlights")
