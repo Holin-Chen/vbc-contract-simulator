@@ -180,7 +180,7 @@ st.subheader("SHAP — Top Improvement Levers")
 
 model, feature_cols, X = load_model()
 if not SHAP_AVAILABLE:
-    st.info("Install `shap` locally (`pip install shap`) to enable SHAP analysis.")
+    st.info("SHAP analysis is loading — if this persists, the shap package may not be installed in this environment.")
 elif model is not None and X is not None:
     try:
         master_idx = df[df["CCN"] == ccn].index
