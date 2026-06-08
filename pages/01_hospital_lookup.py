@@ -8,8 +8,10 @@ import streamlit as st
 import sys
 from pathlib import Path
 
+_root = Path(__file__).parent.parent.resolve()
+if str(_root) not in sys.path:
+    sys.path.insert(0, str(_root))
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
 from src.hcahps_labels import label as hcahps_label
 
 st.set_page_config(page_title="Hospital Lookup", page_icon="🔍", layout="wide")

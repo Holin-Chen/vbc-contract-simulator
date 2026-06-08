@@ -7,7 +7,10 @@ import streamlit as st
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
+_root = Path(__file__).parent.parent.resolve()
+if str(_root) not in sys.path:
+    sys.path.insert(0, str(_root))
+
 from src.simulator import simulate_contract
 
 st.set_page_config(page_title="Contract Simulator", page_icon="📋", layout="wide")

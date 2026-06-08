@@ -14,7 +14,10 @@ try:
 except ImportError:
     SHAP_AVAILABLE = False
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
+_root = Path(__file__).parent.parent.resolve()
+if str(_root) not in sys.path:
+    sys.path.insert(0, str(_root))
+
 from src.simulator import what_if_simulate, simulate_contract
 from src.hcahps_labels import feature_label
 
